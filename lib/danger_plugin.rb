@@ -1,0 +1,1 @@
+require 'sonar/plugin'
