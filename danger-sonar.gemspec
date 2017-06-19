@@ -7,10 +7,10 @@ Gem::Specification.new do |spec|
   spec.name          = 'danger-sonar'
   spec.version       = Sonar::VERSION
   spec.authors       = ['Manoj Babu']
-  spec.email         = ['mbabu@sapient.com']
+  spec.email         = ['gmanojbabu@gmail.com']
   spec.description   = %q{A short description of danger-sonar.}
   spec.summary       = %q{A longer description of danger-sonar.}
-  spec.homepage      = 'https://github.com/Manoj Babu/danger-sonar'
+  spec.homepage      = 'https://github.com/gmanojbabu/danger-sonar'
   spec.license       = 'MIT'
 
   spec.files         = `git ls-files`.split($/)
