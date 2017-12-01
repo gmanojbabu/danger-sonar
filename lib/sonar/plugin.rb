@@ -24,6 +24,8 @@ module Danger
       
     # The path to Sonar configuration file
     attr_accessor :config_file
+    
+    attr_accessor :ignore_file_line_change_check
 
     # Lints Swift files.
     # Generates a `markdown` list of issues(Blocker, Major, Minor, Info) for the prose in a corpus of .markdown and .md files.
@@ -47,11 +49,12 @@ module Danger
         #file = File.read(json_report_file)
         #sonar_report_data = JSON.parse(file)
         
-      # Prepare swiftlint options
+      # Prepare options
       options = {
         report: File.expand_path(json_report_file),
         config: config_file
       }
+        
       # Lint each file and collect the results
       issues = analyse_sonar_report(files, options)
       puts "Issues: #{issues}"
@@ -99,8 +102,13 @@ module Danger
     def issues_in_files_patch(issues)
         files_patch_info = get_files_patch_info()
         puts "Mofified files: #{files_patch_info}"
-        return issues.
-        select { |i| files_patch_info["#{File.expand_path(i['file'])}"] != nil && files_patch_info["#{File.expand_path(i['file'])}"].include?(i['line'].to_i) }
+        if ignore_file_line_change_check
+            return issues.
+                select { |i| files_patch_info["#{File.expand_path(i['file'])}"] != nil }
+        else
+           return issues.
+                select { |i| files_patch_info["#{File.expand_path(i['file'])}"] != nil && files_patch_info["#{File.expand_path(i['file'])}"].include?(i['line'].to_i) } 
+        end
     end
     
     def get_files_patch_info()
