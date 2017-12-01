@@ -41,7 +41,7 @@ module Danger
       excluded_paths = excluded_files_from_config(config_file)
 
       # Extract swift files (ignoring excluded ones)
-      files = find_swift_files(files, excluded_paths)
+      files = find_files(files, excluded_paths)
 
         
         #file = File.read(json_report_file)
@@ -149,14 +149,12 @@ module Danger
     # If files are not provided it will use git modifield and added files
     #
     # @return [Array] swift files
-    def find_swift_files(files=nil, excluded_paths=[])
+    def find_files(files=nil, excluded_paths=[])
       # Assign files to lint
       files = files ? Dir.glob(files) : (git.modified_files - git.deleted_files) + git.added_files
 
       # Filter files to lint
       return files.
-        # Ensure only swift files are selected
-        select { |file| file.end_with?('.swift') }.
         # Make sure we don't fail when paths have spaces
         map { |file| Shellwords.escape(file) }.
         # Remove dups
