@@ -26,6 +26,10 @@ module Danger
     attr_accessor :config_file
     
     attr_accessor :ignore_file_line_change_check
+    
+    attr_accessor :failure_message
+    
+    attr_accessor :warning_message
 
     # Lints Swift files.
     # Generates a `markdown` list of issues(Blocker, Major, Minor, Info) for the prose in a corpus of .markdown and .md files.
@@ -85,6 +89,14 @@ module Danger
           puts message
           markdown message
         end
+      end
+        
+      if failure_message && (blockers.count > 0 || citicals.count > 0 || majors.count > 0)
+        fail(failure_message, sticky: false)
+      else 
+          if warning_message && (minors.count > 0 || infos.count > 0)
+            fail(failure_message, sticky: false)
+          end
       end
     end
 
