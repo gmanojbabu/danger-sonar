@@ -125,7 +125,7 @@ module Danger
                key = files_patch_info.keys.detect{ |k| k.to_s =~ /#{i['file']}/ }
                puts "key"
                puts key
-               return key != nil && files_patch_info["#{key}"].include?(i['line'].to_i)
+               key != nil && files_patch_info["#{key}"].include?(i['line'].to_i)
            end
         end
     end
