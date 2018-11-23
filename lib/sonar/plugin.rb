@@ -115,11 +115,12 @@ module Danger
         files_patch_info = get_files_patch_info()
         puts "Mofified files: #{files_patch_info}"
         if ignore_file_line_change_check
-            return issues.
-                select { |i| files_patch_info["#{File.expand_path(i['file'])}"] != nil }
+            return issues.select { |i| files_patch_info.keys.detect{ |k| k.to_s =~ /#{i['file']}/ } } 
         else
-           return issues.
-                select { |i| files_patch_info["#{File.expand_path(i['file'])}"] != nil && files_patch_info["#{File.expand_path(i['file'])}"].include?(i['line'].to_i) } 
+           return issues.select do |i|
+               key = files_patch_info.keys.detect{ |k| k.to_s =~ /#{i['file']}/ }
+               return key != nil && files_patch_info["#{key}"].include?(i['line'].to_i) 
+           end
         end
     end
     
