@@ -122,7 +122,7 @@ module Danger
            return issues.select do |i|
                puts "Issue"
                puts i
-               key = files_patch_info.keys.detect{ |k| k.to_s =~ /#{i['file']}/ }
+               key = files_patch_info.keys.detect{ |k| k.include?(i['file']) }
                puts "key"
                puts key
                key != nil && files_patch_info["#{key}"].include?(i['line'].to_i)
