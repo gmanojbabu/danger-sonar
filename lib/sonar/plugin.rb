@@ -21,14 +21,14 @@ module Danger
 
     # The path to Sonar report JSON file
     attr_accessor :json_report_file
-      
+
     # The path to Sonar configuration file
     attr_accessor :config_file
-    
+
     attr_accessor :ignore_file_line_change_check
-    
+
     attr_accessor :failure_message
-    
+
     attr_accessor :warning_message
 
     # Lints Swift files.
@@ -49,20 +49,20 @@ module Danger
       # Extract swift files (ignoring excluded ones)
       files = find_files(files, excluded_paths)
 
-        
+
         #file = File.read(json_report_file)
         #sonar_report_data = JSON.parse(file)
-        
+
       # Prepare options
       options = {
         report: File.expand_path(json_report_file),
         config: config_file
       }
-        
+
       # Lint each file and collect the results
       issues = analyse_sonar_report(files, options)
       puts "Issues: #{issues}"
-        
+
       # Filter warnings and errors
       blockers = issues.select { |issue| issue['severity'] == 'BLOCKER' }
       citicals = issues.select { |issue| issue['severity'] == 'CRITICAL' }
@@ -90,10 +90,10 @@ module Danger
           markdown message
         end
       end
-        
+
       if failure_message && (blockers.count > 0 || citicals.count > 0 || majors.count > 0)
         fail(failure_message, sticky: false)
-      else 
+      else
           if warning_message && (minors.count > 0 || infos.count > 0)
             fail(failure_message, sticky: false)
           end
@@ -110,20 +110,26 @@ module Danger
       # Filter issues that are part of modified files
       issues = issues_in_files_patch(issues)
     end
-      
+
     def issues_in_files_patch(issues)
         files_patch_info = get_files_patch_info()
         puts "Mofified files: #{files_patch_info}"
         if ignore_file_line_change_check
-            return issues.select { |i| files_patch_info.keys.detect{ |k| k.to_s =~ /#{i['file']}/ } } 
+            return issues.select { |i| files_patch_info.keys.detect{ |k| k.to_s =~ /#{i['file']}/ } }
         else
+          puts "File patch Info"
+          puts files_patch_info
            return issues.select do |i|
+               puts "Issue"
+               puts i
                key = files_patch_info.keys.detect{ |k| k.to_s =~ /#{i['file']}/ }
-               return key != nil && files_patch_info["#{key}"].include?(i['line'].to_i) 
+               puts "key"
+               puts key
+               return key != nil && files_patch_info["#{key}"].include?(i['line'].to_i)
            end
         end
     end
-    
+
     def get_files_patch_info()
         modified_files_info = Hash.new
         updated_files = (git.modified_files - git.deleted_files) + git.added_files
@@ -131,7 +137,7 @@ module Danger
             file_info = git.diff_for_file(file)
             file_info.patch.split("\n").each do |line|
                 if m = /^@@ -(.*?),(.*?) +(.*?),(.*?) @@/.match(line)
-                    added_lines_match = /\+[0-9]+,[0-9]+/.match(m.to_s) 
+                    added_lines_match = /\+[0-9]+,[0-9]+/.match(m.to_s)
                     added_lines = added_lines_match.to_s.tr('+', '').split(",")
                     from = added_lines.first
                     to = added_lines.last
@@ -145,7 +151,7 @@ module Danger
         }
         modified_files_info
     end
-      
+
     def parse_sonar_report(report_file)
         file = File.read(report_file)
         sonar_report_data = JSON.parse(file)
@@ -242,4 +248,3 @@ module Danger
     end
   end
 end
-
