@@ -1,6 +1,7 @@
 require 'find'
 require 'json'
 require 'shellwords'
+require 'git_diff_parser'
 
 module Danger
 
@@ -105,26 +106,25 @@ module Danger
     # @return [Array] sonar issues
     def analyse_sonar_report(files, options)
       issues = parse_sonar_report(options[:report])
-      puts "Issues in JSON repor: #{issues}\n"
-      puts "File changes #{files}\n"
+      puts "************************************************"
+      puts "************************************************"
+      puts "************************************************"
+      puts "************************************************"
+      puts "************************************************"
+      puts "\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
+      #puts "Issues in JSON repor: #{issues.to_json}\n"
+      #puts "File changes #{files.to_json}\n"
       # Filter issues that are part of modified files
       issues = issues_in_files_patch(issues)
     end
 
     def issues_in_files_patch(issues)
         files_patch_info = get_files_patch_info()
-        puts "Mofified files: #{files_patch_info}"
         if ignore_file_line_change_check
             return issues.select { |i| files_patch_info.keys.detect{ |k| k.to_s =~ /#{i['file']}/ } }
         else
-          puts "File patch Info"
-          puts files_patch_info
            return issues.select do |i|
-               puts "Issue"
-               puts i
                key = files_patch_info.keys.detect{ |k| k.include?(i['file']) }
-               puts "key"
-               puts key
                key != nil && files_patch_info["#{key}"].include?(i['line'].to_i)
            end
         end
@@ -135,22 +135,19 @@ module Danger
         updated_files = (git.modified_files - git.deleted_files) + git.added_files
         updated_files.each {|file|
             file_info = git.diff_for_file(file)
-            file_info.patch.split("\n").each do |line|
-                if m = /^@@ -(.*?),(.*?) +(.*?),(.*?) @@/.match(line)
-                    added_lines_match = /\+[0-9]+,[0-9]+/.match(m.to_s)
-                    added_lines = added_lines_match.to_s.tr('+', '').split(",")
-                    from = added_lines.first
-                    to = added_lines.last
-                    if modified_files_info["#{File.expand_path(file)}"] == nil
-                        modified_files_info[File.expand_path(file)] = Array((from.to_i..to.to_i))
-                    else
-                        modified_files_info[File.expand_path(file)].push((from.to_i..to.to_i))
-                    end
+            file_patches = GitDiffParser.parse(file_info.patch)
+            file_patches.each do |patch|
+                if modified_files_info["#{File.expand_path(file)}"] == nil
+                    modified_files_info[File.expand_path(file)] = Array(patch.changed_line_numbers)
+                else
+                    modified_files_info[File.expand_path(file)].push(patch.changed_line_numbers)
                 end
             end
         }
         modified_files_info
     end
+
+
 
     def parse_sonar_report(report_file)
         file = File.read(report_file)
