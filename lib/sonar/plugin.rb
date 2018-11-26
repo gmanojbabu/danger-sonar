@@ -106,14 +106,6 @@ module Danger
     # @return [Array] sonar issues
     def analyse_sonar_report(files, options)
       issues = parse_sonar_report(options[:report])
-      puts "************************************************"
-      puts "************************************************"
-      puts "************************************************"
-      puts "************************************************"
-      puts "************************************************"
-      puts "\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
-      #puts "Issues in JSON repor: #{issues.to_json}\n"
-      #puts "File changes #{files.to_json}\n"
       # Filter issues that are part of modified files
       issues = issues_in_files_patch(issues)
     end
