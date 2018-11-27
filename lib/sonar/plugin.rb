@@ -34,19 +34,19 @@ module Danger
     attr_accessor :warning_message
 
     # Total Sonar blocker issues found in PR changes
-    attr_accessor :blockers_count
+    attr_accessor :blocker_count
 
-    # Total Sonar citical issues found in PR changes
-    attr_accessor :citicals_count
+    # Total Sonar critical issues found in PR changes
+    attr_accessor :critical_count
 
     # Total Sonar major issues found in PR changes
-    attr_accessor :majors_count
+    attr_accessor :major_count
 
     # Total Sonar minor issues found in PR changes
-    attr_accessor :minors_count
+    attr_accessor :minor_count
 
     # Total Sonar info issues found in PR changes
-    attr_accessor :infos_count
+    attr_accessor :info_count
 
     # Lints Swift files.
     # Generates a `markdown` list of issues(Blocker, Major, Minor, Info) for the prose in a corpus of .markdown and .md files.
@@ -86,12 +86,12 @@ module Danger
       majors = issues.select { |issue| issue['severity'] == 'MAJOR' }
       minors = issues.select { |issue| issue['severity'] == 'MINOR' }
       infos = issues.select { |issue| issue['severity'] == 'INFO' }
-
-      blockers_count = blockers.count
-      citicals_count = citicals.count
-      majors_count = majors.count
-      minors_count = minors.count
-      infos_count = infos.count
+      
+      @blocker_count = if blockers.nil? then 0 else blockers.length end
+      @critical_count = if citicals.nil? then 0 else citicals.length end
+      @major_count = if majors.nil? then 0 else majors.length end
+      @minor_count = if minors.nil? then 0 else minors.length end
+      @info_count = if infos.nil? then 0 else infos.length end
 
       if inline_mode
         # Reprt with inline comment
