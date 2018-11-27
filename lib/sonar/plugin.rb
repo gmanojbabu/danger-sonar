@@ -26,11 +26,27 @@ module Danger
     # The path to Sonar configuration file
     attr_accessor :config_file
 
+    # By default this plugin compairs each line in modifiled file against sonar issue line no, to turn off set this property to true, to check for file match
     attr_accessor :ignore_file_line_change_check
 
     attr_accessor :failure_message
 
     attr_accessor :warning_message
+
+    # Total Sonar blocker issues found in PR changes
+    attr_accessor :blockers_count
+
+    # Total Sonar citical issues found in PR changes
+    attr_accessor :citicals_count
+
+    # Total Sonar major issues found in PR changes
+    attr_accessor :majors_count
+
+    # Total Sonar minor issues found in PR changes
+    attr_accessor :minors_count
+
+    # Total Sonar info issues found in PR changes
+    attr_accessor :infos_count
 
     # Lints Swift files.
     # Generates a `markdown` list of issues(Blocker, Major, Minor, Info) for the prose in a corpus of .markdown and .md files.
@@ -70,6 +86,12 @@ module Danger
       majors = issues.select { |issue| issue['severity'] == 'MAJOR' }
       minors = issues.select { |issue| issue['severity'] == 'MINOR' }
       infos = issues.select { |issue| issue['severity'] == 'INFO' }
+
+      blockers_count = blockers.count
+      citicals_count = citicals.count
+      majors_count = majors.count
+      minors_count = minors.count
+      infos_count = infos.count
 
       if inline_mode
         # Reprt with inline comment
@@ -111,15 +133,15 @@ module Danger
     end
 
     def issues_in_files_patch(issues)
-        files_patch_info = get_files_patch_info()
-        if ignore_file_line_change_check
-            return issues.select { |i| files_patch_info.keys.detect{ |k| k.to_s =~ /#{i['file']}/ } }
-        else
-           return issues.select do |i|
-               key = files_patch_info.keys.detect{ |k| k.include?(i['file']) }
-               key != nil && files_patch_info["#{key}"].include?(i['line'].to_i)
-           end
-        end
+      files_patch_info = get_files_patch_info()
+      if ignore_file_line_change_check
+          return issues.select { |i| files_patch_info.keys.detect{ |k| k.to_s =~ /#{i['file']}/ } }
+      else
+         return issues.select do |i|
+             key = files_patch_info.keys.detect{ |k| k.include?(i['file']) }
+             key != nil && (files_patch_info["#{key}"] != nil && (i['line'].to_s.empty? || files_patch_info["#{key}"].include?(i['line'].to_i)))
+         end
+      end
     end
 
     def get_files_patch_info()
