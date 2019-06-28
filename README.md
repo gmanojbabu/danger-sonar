@@ -1,6 +1,6 @@
 # danger-sonar
 
-A description of danger-sonar.
+A danger plugin to check for Sonar Qube violation.
 
 ## Installation
 
