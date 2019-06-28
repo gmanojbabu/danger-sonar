@@ -18,6 +18,13 @@ sonar.json_report_file = 'sonar-report.json'
 sonar.lint_files
 ```
 
+Pass below options to Sonar Scanner to generate JSON report
+
+```sh
+-Dsonar.analysis.mode=preview -Dsonar.report.export.path=sonar-report.json
+```
+The .json will be generated inside the .sonar directory.
+
 For inline comments in your PR, add below line to your Dangerfile:
 
 ```ruby
