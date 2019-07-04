@@ -140,6 +140,7 @@ module Danger
     end
 
     def issues_in_files_patch(issues)
+      log "Sonar - issues to analyse - \n #{issues}"
       files_patch_info = get_files_patch_info()
       if ignore_file_line_change_check
           return issues.select { |i| files_patch_info.keys.detect{ |k| k.to_s =~ /#{i['file']}/ } }

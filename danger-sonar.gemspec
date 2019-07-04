@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.version       = Sonar::VERSION
   spec.authors       = ['Manoj Babu']
   spec.email         = ['gmanojbabu@gmail.com']
-  spec.description   = %q{A short description of danger-sonar.}
-  spec.summary       = %q{A longer description of danger-sonar.}
+  spec.description   = "Danger plugin to analyse and report sonar violations in pull request Diff."
+  spec.summary       = "Danger plugin to analyse and report sonar violations in pull request Diff."
   spec.homepage      = 'https://github.com/gmanojbabu/danger-sonar'
   spec.license       = 'MIT'
 
