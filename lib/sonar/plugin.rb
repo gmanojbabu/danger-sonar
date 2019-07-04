@@ -48,6 +48,9 @@ module Danger
     # Total Sonar info issues found in PR changes
     attr_accessor :info_count
 
+     # To log additional information for debuging.
+     attr_accessor :verbose
+
     # Lints Swift files.
     # Generates a `markdown` list of issues(Blocker, Major, Minor, Info) for the prose in a corpus of .markdown and .md files.
     #
@@ -62,9 +65,11 @@ module Danger
 
       # Extract excluded paths
       excluded_paths = excluded_files_from_config(config_file)
+      log "Sonar - Excluded paths #{excluded_paths}"
 
       # Extract swift files (ignoring excluded ones)
       files = find_files(files, excluded_paths)
+      log "Sonar - Included files #{files}"
 
 
         #file = File.read(json_report_file)
@@ -75,6 +80,8 @@ module Danger
         report: File.expand_path(json_report_file),
         config: config_file
       }
+
+      log "Sonar - options #{options}"
 
       # Lint each file and collect the results
       issues = analyse_sonar_report(files, options)
@@ -256,6 +263,10 @@ module Danger
 	       filename = r['file'].gsub(dir, "")
 	       send(method, r['reason'], file: filename, line: r['line'])
       end
+    end
+
+    def log(text)
+      puts(text) if @verbose
     end
   end
 end
